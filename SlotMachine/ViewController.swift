@@ -73,16 +73,46 @@ class ViewController: UIViewController {
     }
     
     func betOneButtonPressed (button: UIButton){
-        
+        if credits <= 0 {
+            showAlertWithText(header: "No Mo' Cash", message: "Hit Reset Bro")
+        }
+        else {
+            if currentBet < 5 {
+                ++currentBet
+                --credits
+                updateMainView()
+            }
+            else {
+                showAlertWithText(message: "You can only bet 5 at a time")
+            }
+        }
     }
     
     func betMaxButtonPressed (button: UIButton) {
-        
+        if credits <= 5 {
+            showAlertWithText(header: "Not Enough Credits", message: "Bet Less")
+        }
+        else {
+            if currentBet < 5 {
+                var creditsToBetMax = 5 - currentBet
+                credits -= creditsToBetMax
+                currentBet += creditsToBetMax
+                updateMainView()
+            }
+            else {
+                showAlertWithText(message: "You can only bet 5 credits at a time!")
+            }
+        }
+
     }
     
     func spinButtonPressed (button: UIButton) {
         slots = Factory.createSlots()
         setupSecondContainer()
+        winnings = SlotBrain.computeWinnings(slots) * currentBet
+        credits += winnings
+        currentBet = 0
+        updateMainView()
     }
     
     
@@ -149,7 +179,7 @@ class ViewController: UIViewController {
         
         self.creditsLabel = UILabel()
         self.creditsLabel.text = "000000"
-        self.creditsLabel.textColor = UIColor.redColor()
+        self.creditsLabel.textColor = UIColor.whiteColor()
         self.creditsLabel.font = UIFont(name: "Menlo-Bold", size: 16)
         self.creditsLabel.sizeToFit()
         self.creditsLabel.center = CGPoint(x: thirdContainer.frame.width * kSixth, y: thirdContainer.frame.height * kThird)
@@ -159,7 +189,7 @@ class ViewController: UIViewController {
         
         self.betLabel = UILabel()
         self.betLabel.text = "0000"
-        self.betLabel.textColor = UIColor.redColor()
+        self.betLabel.textColor = UIColor.whiteColor()
         self.betLabel.font = UIFont(name: "Menlo-Bold", size: 16)
         self.betLabel.sizeToFit()
         self.betLabel.center = CGPoint(x: thirdContainer.frame.width * kSixth * 3, y: thirdContainer.frame.height * kThird)
@@ -169,7 +199,7 @@ class ViewController: UIViewController {
         
         self.winnerPaidLabel = UILabel()
         self.winnerPaidLabel.text = "000000"
-        self.winnerPaidLabel.textColor = UIColor.redColor()
+        self.winnerPaidLabel.textColor = UIColor.whiteColor()
         self.winnerPaidLabel.font = UIFont(name: "Menlo-Bold", size: 16)
         self.winnerPaidLabel.sizeToFit()
         self.winnerPaidLabel.center = CGPoint(x: thirdContainer.frame.width * kSixth * 5, y: thirdContainer.frame.height * kThird)
@@ -267,7 +297,7 @@ class ViewController: UIViewController {
         self.winnerPaidLabel.text = "\(winnings)"
     }
     
-    func showAlerWithText (header: String = "Roscoe Warns You", message: String ) {
+    func showAlertWithText (header: String = "Roscoe Warns You", message: String ) {
         var alert = UIAlertController(title: header, message: message, preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
